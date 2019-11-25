@@ -62,6 +62,11 @@ class ClusterDuck {
   private:
     String _deviceId = "";
 
+    int _packetSize = 0;
+    bool _packetAvailable = false;
+
+    static void packetAvailable(int pSize);
+
     DNSServer dnsServer;
     const byte DNS_PORT = 53;
     const char *DNS  = "duck";

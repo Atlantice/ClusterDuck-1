@@ -7,8 +7,6 @@ void setup() {
   duck.begin();
   duck.setupMamaDuck();
 
-  
-
 }
 
 void loop() {

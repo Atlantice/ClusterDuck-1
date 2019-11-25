@@ -143,7 +143,7 @@ void ClusterDuck::setupMamaDuck() {
   setupPortal();
   setupLoRa();
 
-  LoRa.onReceive(repeatLoRaPacket);
+  LoRa.onReceive(packetAvailable);
   LoRa.receive();
 
   Serial.println("MamaDuck Online");
@@ -158,6 +158,12 @@ void ClusterDuck::runMamaDuck() {
     Serial.println("Message Sent");
 
     LoRa.receive();
+  }
+
+  if(_packetAvailable) {
+    repeatLoRaPacket(_packetSize);
+    _packetAvailable = false;
+    _packetSize = 0;
   }
   
 }
@@ -234,7 +240,7 @@ char * ClusterDuck::readPath(byte mLength)  {
   @param packetSize
 */
 
-static void ClusterDuck::repeatLoRaPacket(int packetSize) {
+void ClusterDuck::repeatLoRaPacket(int packetSize) {
   if (packetSize != 0)  {    
     Serial.print("Packet Received");
     // read packet
@@ -377,7 +383,10 @@ String ClusterDuck::uuidCreator() {
   return String(msg);
 }
 
-
+static void ClusterDuck::packetAvailable(int pSize) {
+  _packetAvailable = true;
+  _packetSize = pSize;
+}
 
 //Getters
 
