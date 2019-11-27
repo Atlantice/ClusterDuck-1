@@ -5,8 +5,36 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
 
+DNSServer ClusterDuck::dnsServer;
+String ClusterDuck::_deviceId;
+int ClusterDuck::_rssi = 0;
+float ClusterDuck::_snr;
+long ClusterDuck::_freqErr;
+int ClusterDuck::_availableBytes;
+int ClusterDuck::_packetSize = 0;
+byte ClusterDuck::byteCodes[16];
+String * ClusterDuck::formArray;
+int ClusterDuck::fLength;
+Packet ClusterDuck::_lastPacket;
+byte ClusterDuck::senderId_B   = 0xF5;
+byte ClusterDuck::messageId_B  = 0xF6;
+byte ClusterDuck::payload_B    = 0xF7;
+byte ClusterDuck::iamhere_B    = 0xF8;
+byte ClusterDuck::path_B       = 0xF3;
+bool ClusterDuck::_packetAvailable = false;
+String ClusterDuck::portal = MAIN_page;
+
+const char * ClusterDuck::DNS  = "duck";
+const byte ClusterDuck::DNS_PORT = 53;
+
 ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
-  _deviceId = deviceId;
+  String _deviceId = deviceId;
+
+
+  byte codes[16] = {0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xB1, 0xB2, 0xB3, 0xB4, 0xC1, 0xC2, 0xD1, 0xD2, 0xD3, 0xE4, 0xF4};
+  for (int i = 0; i < 16; i++) {
+    byteCodes[i] = codes[i];
+  }
 
   String * values = new String[formLength];
 
@@ -143,15 +171,15 @@ void ClusterDuck::setupMamaDuck() {
   setupPortal();
   setupLoRa();
 
-  LoRa.onReceive(packetAvailable);
+  LoRa.onReceive(repeatLoRaPacket);
   LoRa.receive();
 
   Serial.println("MamaDuck Online");
-  u8x8.drawString(0, 1, "Duck Online");
+  u8x8.drawString(0, 1, "MamaDuck Online");
 }
 
 void ClusterDuck::runMamaDuck() {
-  
+
   if (runCaptivePortal()) {
     Serial.println("Portal data received");
     sendPayload(_deviceId, uuidCreator(), getPortalData());
@@ -159,13 +187,6 @@ void ClusterDuck::runMamaDuck() {
 
     LoRa.receive();
   }
-
-  if(_packetAvailable) {
-    repeatLoRaPacket(_packetSize);
-    _packetAvailable = false;
-    _packetSize = 0;
-  }
-  
 }
 
 /**
@@ -185,24 +206,28 @@ String * ClusterDuck::getPortalData() {
 }
 
 void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
-  
-  if(arr[0] == "0xF8") { //Send pong to a ping
+
+  if (arr[0] == "0xF8") { //Send pong to a ping
     LoRa.beginPacket();
     couple(iamhere_B, "1");
     LoRa.endPacket();
-  } else if(arr[0] != "0xF7") { //Don't send a pong to a pong
-    LoRa.beginPacket();
-    couple(senderId_B, senderId);
-    couple(messageId_B, messageId);
-    for (int i = 0; i < fLength; i++) {
-      couple(byteCodes[i], arr[i]);
+    Serial.println("Pong packet sent");
+  } else if (arr[0] != "0xF7") { //Don't send a pong to a pong
+    if (checkPath(lastPath)) {
+      LoRa.beginPacket();
+      couple(senderId_B, senderId);
+      couple(messageId_B, messageId);
+      for (int i = 0; i < fLength; i++) {
+        couple(byteCodes[i], arr[i]);
+      }
+      if (lastPath == "") {
+        couple(path_B, _deviceId);
+      } else {
+        couple(path_B, lastPath + "," + _deviceId);
+      }
+      LoRa.endPacket();
+      Serial.println("Packet sent");
     }
-    if(lastPath == "") {
-      couple(path_B, _deviceId);
-    } else {
-      couple(path_B, lastPath + "," + _deviceId);
-    }
-    LoRa.endPacket(); 
   }
 }
 
@@ -231,7 +256,7 @@ char * ClusterDuck::readPath(byte mLength)  {
     arr[i] = (char)LoRa.read();
   }
   return arr;
-  
+
 }
 
 /**
@@ -241,24 +266,28 @@ char * ClusterDuck::readPath(byte mLength)  {
 */
 
 void ClusterDuck::repeatLoRaPacket(int packetSize) {
-  if (packetSize != 0)  {    
-    Serial.print("Packet Received");
+  if (packetSize != 0)  {
+    Serial.println("Packet Received");
     // read packet
 
     _rssi = LoRa.packetRssi();
     _snr = LoRa.packetSnr();
-    _freqErr = LoRa.packetFrequencyError();
-    _availableBytes = LoRa.available();
+    //_freqErr = LoRa.packetFrequencyError();
+    //    _availableBytes = LoRa.available();
+
+    Serial.println("Get packet data");
 
     String * arr = getPacketData(packetSize);
 
-    if(checkPath(_lastPacket.path)) {
-      sendPayload(_lastPacket.senderId, _lastPacket.messageId, arr, _lastPacket.path); 
-    }
+    sendPayload(_lastPacket.senderId, _lastPacket.messageId, arr, _lastPacket.path);
+
+    LoRa.receive();
   }
+  Serial.println("Exit callback");
 }
 
 bool ClusterDuck::checkPath(String path) {
+  Serial.println("Checking Path");
   String temp = "";
   int len = path.length() + 1;
   char arr[len];
@@ -281,7 +310,7 @@ String * ClusterDuck::getPacketData(int pSize) {
   String * packetData = new String[pSize];
   int i = 0;
   byte byteCode, mLength;
-  
+
   while (LoRa.available())
   {
     byteCode = LoRa.read();
@@ -303,6 +332,7 @@ String * ClusterDuck::getPacketData(int pSize) {
       i++;
     }
     else if (byteCode == iamhere_B) { //DetectorDuck
+      Serial.println("Ping pong");
       String ping = readMessages(mLength);
       if (ping == "0") {
         packetData[i] = "0xF8";
@@ -383,7 +413,7 @@ String ClusterDuck::uuidCreator() {
   return String(msg);
 }
 
-static void ClusterDuck::packetAvailable(int pSize) {
+void ClusterDuck::packetAvailable(int pSize) {
   _packetAvailable = true;
   _packetSize = pSize;
 }
