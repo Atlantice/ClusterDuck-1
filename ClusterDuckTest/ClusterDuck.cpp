@@ -2,30 +2,30 @@
 
 U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/ 16);
 
+//PAPA CRED INFO
+//TODO: Move this info
+
+#define SSID     ""
+#define PASSWORD ""
+
+#define ORG         ""                  // "quickstart" or use your organisation
+#define DEVICE_ID   ""
+#define DEVICE_TYPE ""                // your device type or not used for "quickstart"
+#define TOKEN       ""      // your device token or not used for "quickstart"#define SSID        "nick_owl" // Type your SSID
+
+char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
+char topic[]            = "iot-2/evt/status/fmt/json";
+char authMethod[]       = "use-token-auth";
+char token[]            = TOKEN;
+char clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
+
+//END PAPA CRED INFO
+
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
+WiFiClientSecure wifiClient;
+PubSubClient client(server, 8883, wifiClient);
 
-DNSServer ClusterDuck::dnsServer;
-String ClusterDuck::_deviceId;
-int ClusterDuck::_rssi = 0;
-float ClusterDuck::_snr;
-long ClusterDuck::_freqErr;
-int ClusterDuck::_availableBytes;
-int ClusterDuck::_packetSize = 0;
-byte ClusterDuck::byteCodes[16];
-String * ClusterDuck::formArray;
-int ClusterDuck::fLength;
-Packet ClusterDuck::_lastPacket;
-byte ClusterDuck::senderId_B   = 0xF5;
-byte ClusterDuck::messageId_B  = 0xF6;
-byte ClusterDuck::payload_B    = 0xF7;
-byte ClusterDuck::iamhere_B    = 0xF8;
-byte ClusterDuck::path_B       = 0xF3;
-bool ClusterDuck::_packetAvailable = false;
-String ClusterDuck::portal = MAIN_page;
-
-const char * ClusterDuck::DNS  = "duck";
-const byte ClusterDuck::DNS_PORT = 53;
 
 ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
   String _deviceId = deviceId;
@@ -353,6 +353,36 @@ String * ClusterDuck::getPacketData(int pSize) {
   return packetData;
 }
 
+void ClusterDuck::quackJson(Packet packet)
+{
+  const int bufferSize = 4 * JSON_OBJECT_SIZE(1);
+  DynamicJsonBuffer jsonBuffer(bufferSize);
+
+  JsonObject& root = jsonBuffer.createObject();
+
+
+  root["DeviceID"]        = packet.senderId;
+  root["MessageID"]       = packet.messageId;
+  root["Payload"]         = packet.payload;
+
+  root["path"]            = packet.path + "," + _deviceId;
+
+  String jsonstat;
+  root.printTo(jsonstat);
+  root.prettyPrintTo(Serial);
+
+  if (client.publish(topic, jsonstat.c_str()))
+  {
+    Serial.println("Publish ok");
+    root.prettyPrintTo(Serial);
+    Serial.println("");
+  }
+  else
+  {
+    Serial.println("Publish failed");
+  }
+}
+
 /**
   restart
   Only restarts ESP
@@ -423,3 +453,31 @@ void ClusterDuck::packetAvailable(int pSize) {
 String ClusterDuck::getDeviceId() {
   return _deviceId;
 }
+
+
+DNSServer ClusterDuck::dnsServer;
+const char * ClusterDuck::DNS  = "duck";
+const byte ClusterDuck::DNS_PORT = 53;
+
+String ClusterDuck::_deviceId;
+
+int ClusterDuck::_rssi = 0;
+float ClusterDuck::_snr;
+long ClusterDuck::_freqErr;
+int ClusterDuck::_availableBytes;
+int ClusterDuck::_packetSize = 0;
+
+byte ClusterDuck::byteCodes[16];
+String * ClusterDuck::formArray;
+int ClusterDuck::fLength;
+
+Packet ClusterDuck::_lastPacket;
+
+byte ClusterDuck::senderId_B   = 0xF5;
+byte ClusterDuck::messageId_B  = 0xF6;
+byte ClusterDuck::payload_B    = 0xF7;
+byte ClusterDuck::iamhere_B    = 0xF8;
+byte ClusterDuck::path_B       = 0xF3;
+bool ClusterDuck::_packetAvailable = false;
+
+String ClusterDuck::portal = MAIN_page;

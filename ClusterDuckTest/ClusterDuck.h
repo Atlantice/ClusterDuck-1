@@ -17,6 +17,10 @@
 #include <ESPmDNS.h>
 #include "index.h"
 
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include <WiFiClientSecure.h>
+
 typedef struct
 {
   String senderId;
@@ -95,6 +99,8 @@ class ClusterDuck {
     static byte payload_B;
     static byte iamhere_B;
     static byte path_B;
+
+    static void quackJson(Packet packet);
 
 };
 
