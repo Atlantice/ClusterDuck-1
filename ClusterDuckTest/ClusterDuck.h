@@ -17,9 +17,14 @@
 #include <ESPmDNS.h>
 #include "index.h"
 
+//#ifdef PAPA
+
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
+
+//#endif
+
 
 typedef struct
 {
@@ -59,6 +64,13 @@ class ClusterDuck {
     static int _availableBytes;
 
     static String getDeviceId();
+
+    void setupWiFi(String ssid, String password);
+    bool checkWifiConnection();
+    void setupMQTT();
+    void setupPapaDuck(String org, String deviceType, String token, String ssid, String password);
+    void runPapaDuck();
+    
 
   protected:
     static Packet _lastPacket;
