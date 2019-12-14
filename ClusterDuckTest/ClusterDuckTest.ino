@@ -6,11 +6,11 @@ ClusterDuck duck("Device ID");
 void setup() {
   // put your setup code here, to run once:
   duck.begin();
-  duck.setupPapaDuck("quickstart", "PAPA", "", "HEINEKEN", "duckduckowl");
+  duck.setupMamaDuck();
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  duck.runPapaDuck();
+  duck.runMamaDuck();
 }

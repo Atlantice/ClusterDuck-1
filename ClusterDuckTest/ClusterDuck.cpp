@@ -4,10 +4,6 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
-#ifdef PAPA
-WiFiClientSecure wifiClient;
-PubSubClient client(server, 8883, wifiClient);
-#endif
 
 
 ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
@@ -125,130 +121,6 @@ bool ClusterDuck::runCaptivePortal() {
     return false;
   }
 }
-
-
-#ifdef PAPA
-
-/**
-setupWiFi
-Connects to local SSID
-*/
-void ClusterDuck::setupWiFi(String ssid, String password) {
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-
-  // Connect to Access Poink
-  WiFi.begin(ssid, password);
-  u8x8.drawString(0, 1, "Connecting...");
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    //timer.tick(); //Advance timer to reboot after awhile
-    delay(500);
-    Serial.print(".");
-  }
-}
-
-bool ClusterDuck::checkWifiConnection() {
-  if(WiFi.status() == WL_CONNECTED)
-  {
-    return true;
-  } else {
-    Serial.print("WiFi disconnected from local network: ");
-    Serial.print(_ssid);
-    return false;
-  }
-}
-
-/**
-setupMQTT
-Sets Up MQTT
-*/
-void ClusterDuck::setupMQTT() {
-  if (!!!client.connected())
-  {
-//    if(disconnected) {
-//      timeOff = millis();
-//    }
-    Serial.print("Reconnecting client to "); Serial.println(_server);
-    while ( ! (_org == "quickstart" ? client.connect() : client.connect(_clientId, _authMethod, _token)))
-    {
-      timer.tick(); //Advance timer to reboot after awhile
-      Serial.print(".");
-      delay(500);
-    }
-//    if(disconnected) {
-//      qtest.payload = "Papa disconnected from WiFi for:" + String(millis() - timeOff); //Record that lost wifi and then reconnected
-//      papaHealth();  
-//    }
-//    else {
-//      qtest.payload = "Papa disconnected from MQTT for:" + String(millis() - timeOff); //Record that lost connection to MQTT and then reconnected
-//      //papaHealth();
-//    }
-    Serial.println();
-  }
-}
-
-void ClusterDuck::quackJson(Packet packet) {
-  const int bufferSize = 4 * JSON_OBJECT_SIZE(1);
-  DynamicJsonBuffer jsonBuffer(bufferSize);
-
-  JsonObject& root = jsonBuffer.createObject();
-
-  root["DeviceID"]        = packet.senderId;
-  root["MessageID"]       = packet.messageId;
-  root["Payload"]         = packet.payload;
-
-  root["path"]            = packet.path + "," + _deviceId;
-
-  String jsonstat;
-  root.printTo(jsonstat);
-  root.prettyPrintTo(Serial);
-
-  if (client.publish(topic, jsonstat.c_str()))
-  {
-    Serial.println("Publish ok");
-    root.prettyPrintTo(Serial);
-    Serial.println("");
-  }
-  else
-  {
-    Serial.println("Publish failed");
-  }
-}
-
-void ClusterDuck::setupPapaDuck(String org, String deviceType, String token, String ssid, String password) {
-  _org = org;
-  _deviceType = deviceType;
-  _token = token;
-  _ssid = ssid;
-  _password = password;
-
-  _server = _org + ".messaging.internetofthings.ibmcloud.com";
-  _topic = "iot-2/evt/status/fmt/json";
-  _aurthMethod = "use-token-auth";
-  _clientId = "d:" + _org + ":" + _deviceType + ":" + _deviceId;
-  
-  setupWifi(_ssid, _password);
-
-  Serial.println("");
-  Serial.println("WiFi connected - PAPA ONLINE");
-  u8x8.drawString(0, 1, "PAPA Online");
-}
-
-void ClusterDuck::runPapaDuck() {
-  if(!checkWifiConnection()) {
-    Serial.println("Reconnecting to WiFi");
-    setupWifi(_ssid, _password);
-  }
-
-  setupMQTT();
-  
-}
-
-#endif
-
 
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
@@ -528,30 +400,6 @@ void ClusterDuck::packetAvailable(int pSize) {
 String ClusterDuck::getDeviceId() {
   return _deviceId;
 }
-
-#ifdef PAPA
-
-String ClusterDuck::_org;
-String ClusterDuck::_deviceType;
-String ClusterDuck::_token;
-
-String ClusterDuck::_ssid;
-String ClusterDuck::_password;
-
-String ClusterDuck::_server;
-String ClusterDuck::_topic;
-String ClusterDuck::_authMethod;
-//char ClusterDuck::token
-String ClusterDuck::_clientId;
-
-//char ClusterDuck::server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
-//char ClusterDuck::topic[]            = "iot-2/evt/status/fmt/json";
-//char ClusterDuck::authMethod[]       = "use-token-auth";
-//char ClusterDuck::token[]            = TOKEN;
-//char ClusterDuck::clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
-
-#endif
-
 
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
