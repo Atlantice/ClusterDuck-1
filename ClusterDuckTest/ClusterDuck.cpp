@@ -5,10 +5,16 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
 
+String ClusterDuck::_deviceId = "";
 
-ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
-  String _deviceId = deviceId;
+ClusterDuck::ClusterDuck() {
 
+
+}
+
+void ClusterDuck::setDeviceId(String deviceId, const int formLength) {
+  _deviceId = deviceId;
+  
   byte codes[16] = {0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xB1, 0xB2, 0xB3, 0xB4, 0xC1, 0xC2, 0xD1, 0xD2, 0xD3, 0xE4, 0xF4};
   for (int i = 0; i < 16; i++) {
     byteCodes[i] = codes[i];
@@ -18,7 +24,6 @@ ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
 
   formArray = values;
   fLength = formLength;
-
 }
 
 void ClusterDuck::begin(int baudRate) {
@@ -183,7 +188,8 @@ String * ClusterDuck::getPortalData() {
 }
 
 void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
-
+  Serial.println("Setup Payload");
+  Serial.println(sizeof(arr));
   if (arr[0] == "0xF8") { //Send pong to a ping
     LoRa.beginPacket();
     couple(iamhere_B, "1");
@@ -196,6 +202,7 @@ void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, S
       couple(messageId_B, messageId);
       for (int i = 0; i < fLength; i++) {
         couple(byteCodes[i], arr[i]);
+        Serial.println(arr[i]);
       }
       if (lastPath == "") {
         couple(path_B, _deviceId);
@@ -247,8 +254,8 @@ void ClusterDuck::repeatLoRaPacket(int packetSize) {
     Serial.println("Packet Received");
     // read packet
 
-    _rssi = LoRa.packetRssi();
-    _snr = LoRa.packetSnr();
+//    _rssi = LoRa.packetRssi();
+//    _snr = LoRa.packetSnr();
     //_freqErr = LoRa.packetFrequencyError();
     //    _availableBytes = LoRa.available();
 
@@ -273,6 +280,7 @@ bool ClusterDuck::checkPath(String path) {
   for (int i = 0; i < len; i++) {
     if (arr[i] == ',' || i == len - 1) {
       if (temp == _deviceId) {
+        Serial.print(path);
         return false;
       }
       temp = "";
@@ -280,6 +288,8 @@ bool ClusterDuck::checkPath(String path) {
       temp += arr[i];
     }
   }
+  Serial.println("true");
+  Serial.println(path);
   return true;
 }
 
@@ -404,8 +414,6 @@ String ClusterDuck::getDeviceId() {
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
-
-String ClusterDuck::_deviceId;
 
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;

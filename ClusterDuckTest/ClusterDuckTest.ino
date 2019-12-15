@@ -1,11 +1,10 @@
-#define PAPA //TODO: try to get away from using this
 #include "ClusterDuck.h"
-
-ClusterDuck duck("Device ID");
+ClusterDuck duck;
 
 void setup() {
   // put your setup code here, to run once:
   duck.begin();
+  duck.setDeviceId("Z", 10);
   duck.setupMamaDuck();
 
 }

@@ -28,9 +28,10 @@ typedef struct
 class ClusterDuck {
   public:
     //Constructor
-    ClusterDuck(String deviceId = "", const int formLength = 10);
+    ClusterDuck();
 
     //Exposed Methods
+    static void setDeviceId(String deviceId = "", const int formLength = 10);
     static void begin(int baudRate = 115200);
     static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
     static void setupDisplay();
@@ -41,7 +42,7 @@ class ClusterDuck {
     static void setupMamaDuck();
     static void runDuckLink();
     static void runMamaDuck();
-    
+
     static String * getPortalData();
     static String * getPacketData(int pSize);
 
@@ -54,13 +55,17 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
+    static void sendPayload(String senderId, String messageId, String * arr, String path = "");
+
+    static String uuidCreator();
+
     static String getDeviceId();
 
   protected:
     static Packet _lastPacket;
-    
-  private:
     static String _deviceId;
+
+  private:
 
     static int _packetSize;
     static bool _packetAvailable;
@@ -77,10 +82,8 @@ class ClusterDuck {
 
     static void restartDuck();
     static void couple(byte byteCode, String outgoing);
-    static void sendPayload(String senderId, String messageId, String * arr, String path = "");
     static String readMessages(byte mLength);
     static bool reboot(void *);
-    static String uuidCreator();
     static char * readPath(byte mLength);
     static bool checkPath(String path);
 
