@@ -12,4 +12,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
+  
+  String hi = "Hi my name is";
+  duck.sendPayloadMessage(hi);
+  
 }

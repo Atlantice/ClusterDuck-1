@@ -198,6 +198,15 @@ String * ClusterDuck::getPortalData() {
   return val;
 }
 
+void ClusterDuck::sendPayloadMessage(String msg) {
+  String * message = new String[1];
+  String * val = message;
+
+  val[1] = msg;
+
+  sendPayload(_deviceId, uuidCreator(), val);
+}
+
 void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
   Serial.println("Setup Payload");
   Serial.println(sizeof(arr));
