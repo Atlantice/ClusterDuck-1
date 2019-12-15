@@ -153,7 +153,15 @@ void ClusterDuck::setupMamaDuck() {
   setupPortal();
   setupLoRa();
 
-  LoRa.onReceive(repeatLoRaPacket);
+  //LoRa.onReceive(repeatLoRaPacket);
+  LoRa.receive();
+
+  Serial.println("Test Packet");
+  LoRa.beginPacket();
+  couple(iamhere_B, "1");
+  LoRa.endPacket();
+  Serial.print("Packet Sent");
+
   LoRa.receive();
 
   Serial.println("MamaDuck Online");
@@ -161,7 +169,10 @@ void ClusterDuck::setupMamaDuck() {
 }
 
 void ClusterDuck::runMamaDuck() {
-
+  int packetSize = LoRa.parsePacket();
+  if(packetSize != 0) {
+    repeatLoRaPacket(packetSize);
+  }
   if (runCaptivePortal()) {
     Serial.println("Portal data received");
     sendPayload(_deviceId, uuidCreator(), getPortalData());
