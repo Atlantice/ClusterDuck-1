@@ -5,6 +5,8 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
 
+auto timer = timer_create_default(); // create a timer with default settings
+
 String ClusterDuck::_deviceId = "";
 
 ClusterDuck::ClusterDuck() {
@@ -166,9 +168,13 @@ void ClusterDuck::setupMamaDuck() {
 
   Serial.println("MamaDuck Online");
   u8x8.drawString(0, 1, "MamaDuck Online");
+
+  timer.every(43200000, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
+  timer.tick();
+  
   int packetSize = LoRa.parsePacket();
   if(packetSize != 0) {
     repeatLoRaPacket(packetSize);
@@ -371,13 +377,14 @@ void ClusterDuck::restartDuck()
 }
 
 //Timer reboot
-//bool ClusterDuck::reboot(void *) {
-//  char * r[6] = {'R','e','b','o','o','t'};
-//  sendPayload(_deviceId, uuidCreator(), r);
-//  restartDuck();
-//
-//  return true;
-//}
+bool ClusterDuck::reboot(void *) {
+  String reboot = "REBOOT";
+  Serial.println(reboot);
+  sendPayloadMessage(reboot);
+  restartDuck();
+
+  return true;
+}
 
 //Get Duck MAC address
 String ClusterDuck::duckID()
