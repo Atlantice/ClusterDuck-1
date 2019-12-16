@@ -1,9 +1,8 @@
 #include "ClusterDuck.h"
-#include <Adafruit_BMP085_U.h>
 #include "timer.h"
 
-Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 auto timer = timer_create_default(); // create a timer with default settings
+int smokeA0 = 39;
 
 ClusterDuck duck;
 
@@ -14,14 +13,8 @@ void setup() {
   duck.setDeviceId("Test", 10);
   duck.setupMamaDuck();
 
-  if (!bmp.begin())
-  {
-    Serial.print("Ooops, no BMP085 detected ... Check your wiring or I2C ADDR!");
-  } else {
-    Serial.println("BMP180 ON");
-  }
-
-  timer.every(300000, runSensor);
+  pinMode(smokeA0, INPUT);
+  timer.every(5000, runSensor);
 }
 
 void loop() {
@@ -32,19 +25,14 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  float T,P;
-  String vals;
+
+  ////// Set up MQ-X Gas Sensor
+  int analogSensor = analogRead(smokeA0);
+  Serial.println("Reading:");
+  Serial.println(analogSensor);
+  Serial.println(" ");
   
-  bmp.getTemperature(&T);
-  Serial.println(T);
-  
-  bmp.getPressure(&P);
-  Serial.println(P);
-  
-  vals = "Temp: " + String(T) + " Pres: " + String(P);
-  Serial.println(vals);
-  
-  duck.sendPayloadMessage(vals);
+  // duck.sendPayloadMessage(String(analogSensor));
   
   return true;
 }
