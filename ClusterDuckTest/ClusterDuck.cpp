@@ -300,6 +300,7 @@ bool ClusterDuck::checkPath(String path) {
     if (arr[i] == ',' || i == len - 1) {
       if (temp == _deviceId) {
         Serial.print(path);
+        Serial.print("false");
         return false;
       }
       temp = "";
@@ -324,17 +325,17 @@ String * ClusterDuck::getPacketData(int pSize) {
     if (byteCode == senderId_B)
     {
       _lastPacket.senderId  = readMessages(mLength);
-      Serial.println("User ID: " + packetData[i]);
+      Serial.println("User ID: " + _lastPacket.senderId);
       i++;
     }
     else if (byteCode == messageId_B) {
       _lastPacket.messageId = readMessages(mLength);
-      Serial.println("Message ID: " + packetData[i]);
+      Serial.println("Message ID: " + _lastPacket.messageId);
       i++;
     }
     else if (byteCode == payload_B) {
       _lastPacket.payload = readMessages(mLength);
-      Serial.println("Message: " + packetData[i]);
+      Serial.println("Message: " + _lastPacket.payload);
       i++;
     }
     else if (byteCode == iamhere_B) { //DetectorDuck
@@ -348,7 +349,7 @@ String * ClusterDuck::getPacketData(int pSize) {
     }
     else if (byteCode == path_B) {
       _lastPacket.path = readMessages(mLength);
-      Serial.println("Path: " + packetData[i]);
+      Serial.println("Path: " + _lastPacket.path);
       i++;
     } else {
       packetData[i] = readMessages(mLength);
