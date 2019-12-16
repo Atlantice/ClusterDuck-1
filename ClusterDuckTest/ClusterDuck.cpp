@@ -5,7 +5,7 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
 
-auto timer = timer_create_default(); // create a timer with default settings
+auto tymer = timer_create_default(); // create a timer with default settings
 
 String ClusterDuck::_deviceId = "";
 
@@ -161,12 +161,12 @@ void ClusterDuck::setupMamaDuck() {
   Serial.println("MamaDuck Online");
   u8x8.drawString(0, 1, "MamaDuck Online");
 
-  timer.every(1800000, imAlive)
-  timer.every(43200000, reboot);
+  tymer.every(1800000, imAlive);
+  tymer.every(43200000, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
-  timer.tick();
+  tymer.tick();
   
   int packetSize = LoRa.parsePacket();
   if(packetSize != 0) {
