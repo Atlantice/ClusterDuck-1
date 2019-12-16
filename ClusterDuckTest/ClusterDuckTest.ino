@@ -16,10 +16,9 @@ void setup() {
 
   if (!bmp.begin())
   {
-    /* There was a problem detecting the BMP085 ... check your connections */
     Serial.print("Ooops, no BMP085 detected ... Check your wiring or I2C ADDR!");
   } else {
-    Serial.println("here");
+    Serial.println("BMP180 ON");
   }
 
   timer.every(300000, runSensor);
@@ -27,9 +26,9 @@ void setup() {
 
 void loop() {
   timer.tick();
+  
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
-
 }
 
 bool runSensor(void *) {
@@ -37,16 +36,14 @@ bool runSensor(void *) {
   String vals;
   
   bmp.getTemperature(&T);
-  //T = bmp.readTemperature();
   Serial.println(T);
-  bmp.getPressure(&P);
-  //P = bmp.readPressure();
-  Serial.println(P);
-
-  Serial.println("Temp: " + String(T) + " Pres: " + String(P));
   
-  vals = "Temp: " + String(T) + " Pres: " + String(P); //Store Data
-
+  bmp.getPressure(&P);
+  Serial.println(P);
+  
+  vals = "Temp: " + String(T) + " Pres: " + String(P);
+  Serial.println(vals);
+  
   duck.sendPayloadMessage(vals);
   
   return true;
