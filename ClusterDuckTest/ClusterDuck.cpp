@@ -306,11 +306,6 @@ bool ClusterDuck::checkPath(String path) {
       temp = "";
     } else {
       temp += arr[i];
-      if (temp == _deviceId) {
-        Serial.print(path);
-        Serial.print("false");
-        return false;
-      }
     }
   }
   Serial.println("true");
