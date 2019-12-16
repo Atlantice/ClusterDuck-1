@@ -6,6 +6,8 @@
 ClusterDuck duck;
 
 void setup() {
+  //timer.tick();
+  
   // put your setup code here, to run once:
   duck.begin();
   duck.setDeviceId("Z", 10);
