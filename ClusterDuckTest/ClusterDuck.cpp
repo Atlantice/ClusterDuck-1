@@ -166,7 +166,7 @@ void ClusterDuck::setupMamaDuck() {
 }
 
 void ClusterDuck::runMamaDuck() {
-  timer.tick();
+  tymer.tick();
   
   int packetSize = LoRa.parsePacket();
   if(packetSize != 0) {
