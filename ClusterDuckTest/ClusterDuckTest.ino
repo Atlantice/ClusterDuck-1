@@ -1,10 +1,14 @@
 #include "ClusterDuck.h"
 #include "timer.h"
+#include <SimpleDHT.h>
 
 auto timer = timer_create_default(); // create a timer with default settings
-int smokeA0 = 39;
 
 ClusterDuck duck;
+
+// set up DHT temp/humidity sensor
+int pinDHT11 = 13;
+SimpleDHT11 dht11(pinDHT11);
 
 void setup() {
 
@@ -26,13 +30,23 @@ void loop() {
 
 bool runSensor(void *) {
 
-  ////// Set up MQ-X Gas Sensor
-  int analogSensor = analogRead(smokeA0);
-  Serial.println("Reading:");
-  Serial.println(analogSensor);
-  Serial.println(" ");
-  
-  // duck.sendPayloadMessage(String(analogSensor));
+  /////// DHT11 Temperature/humidity sensor
+  byte temperature = 0;
+  byte ftemperature = 0;
+  byte humidity = 0;
+  int err = SimpleDHTErrSuccess;
+  if ((err = dht11.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
+    Serial.print("Read DHT11 failed, err="); Serial.println(err);delay(1000);
+    return;
+  }
+  ftemperature = ((float)temperature*1.8) + 32;
+  Serial.println((float)ftemperature); Serial.print(" ftemp ");
+  Serial.print((float)temperature); Serial.print(" *C, "); 
+  Serial.print((float)humidity); Serial.println(" H");
+
+  String values = temperature + "C " + humidity + " H";
+
+  //duck.sendPayloadMessage(values);
   
   return true;
 }
