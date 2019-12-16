@@ -201,7 +201,8 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   LoRa.beginPacket();
   couple(senderId_B, _deviceId);
   couple(messageId_B, uuidCreator());
-  couple(byteCodes[0], msg);
+  couple(payload_B, msg);
+  couple(path_B, _deviceId);
   LoRa.endPacket(); 
 }
 
