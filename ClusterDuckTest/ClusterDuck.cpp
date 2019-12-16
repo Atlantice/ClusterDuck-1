@@ -16,7 +16,7 @@ ClusterDuck::ClusterDuck() {
 
 void ClusterDuck::setDeviceId(String deviceId, const int formLength) {
   _deviceId = deviceId;
-  
+
   byte codes[16] = {0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xB1, 0xB2, 0xB3, 0xB4, 0xC1, 0xC2, 0xD1, 0xD2, 0xD3, 0xE4, 0xF4};
   for (int i = 0; i < 16; i++) {
     byteCodes[i] = codes[i];
@@ -167,9 +167,9 @@ void ClusterDuck::setupMamaDuck() {
 
 void ClusterDuck::runMamaDuck() {
   tymer.tick();
-  
+
   int packetSize = LoRa.parsePacket();
-  if(packetSize != 0) {
+  if (packetSize != 0) {
     repeatLoRaPacket(packetSize);
   }
   if (runCaptivePortal()) {
@@ -198,12 +198,11 @@ String * ClusterDuck::getPortalData() {
 }
 
 void ClusterDuck::sendPayloadMessage(String msg) {
-  String * message = new String[1];
-  String * val = message;
-
-  val[1] = msg;
-
-  sendPayload(_deviceId, uuidCreator(), val);
+  LoRa.beginPacket();
+  couple(senderId_B, _deviceId);
+  couple(messageId_B, uuidCreator());
+  couple(byteCodes[0], msg);
+  LoRa.endPacket(); 
 }
 
 void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
@@ -273,8 +272,8 @@ void ClusterDuck::repeatLoRaPacket(int packetSize) {
     Serial.println("Packet Received");
     // read packet
 
-//    _rssi = LoRa.packetRssi();
-//    _snr = LoRa.packetSnr();
+    //    _rssi = LoRa.packetRssi();
+    //    _snr = LoRa.packetSnr();
     //_freqErr = LoRa.packetFrequencyError();
     //    _availableBytes = LoRa.available();
 
@@ -383,7 +382,7 @@ bool ClusterDuck::imAlive(void *) {
   String alive = "1";
   sendPayloadMessage(alive);
   Serial.print("alive");
-  
+
   return true;
 }
 
