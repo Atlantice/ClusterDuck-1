@@ -158,17 +158,10 @@ void ClusterDuck::setupMamaDuck() {
   //LoRa.onReceive(repeatLoRaPacket);
   LoRa.receive();
 
-  Serial.println("Test Packet");
-  LoRa.beginPacket();
-  couple(iamhere_B, "1");
-  LoRa.endPacket();
-  Serial.print("Packet Sent");
-
-  LoRa.receive();
-
   Serial.println("MamaDuck Online");
   u8x8.drawString(0, 1, "MamaDuck Online");
 
+  timer.every(1800000, imAlive)
   timer.every(43200000, reboot);
 }
 
@@ -383,6 +376,14 @@ bool ClusterDuck::reboot(void *) {
   sendPayloadMessage(reboot);
   restartDuck();
 
+  return true;
+}
+
+bool ClusterDuck::imAlive(void *) {
+  String alive = "1";
+  sendPayloadMessage(alive);
+  Serial.print("alive");
+  
   return true;
 }
 

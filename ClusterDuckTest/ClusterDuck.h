@@ -63,6 +63,7 @@ class ClusterDuck {
 
     static String getDeviceId();
     static void sendPayloadMessage(String msg);
+    static bool imAlive(void *);
 
   protected:
     static Packet _lastPacket;
