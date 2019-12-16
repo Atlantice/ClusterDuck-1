@@ -1,4 +1,9 @@
 #include "ClusterDuck.h"
+#include "timer.h"
+
+auto timer = timer_create_default(); // create a timer with default settings
+
+
 ClusterDuck duck;
 
 void setup() {
