@@ -34,9 +34,27 @@ void ClusterDuck::begin(int baudRate) {
   //Serial.println(_deviceId + " says Quack!");
 }
 
-void ClusterDuck::setupDisplay()  {
+void ClusterDuck::setupDisplay(String deviceType)  {
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
+
+  u8x8.setCursor(0, 1);
+  u8x8.print("    ((>.<))    ");
+
+  u8x8.setCursor(0, 2);
+  u8x8.print("  Project OWL  ");
+  
+  u8x8.setCursor(0, 4);
+  u8x8.print("Device: " + deviceType);
+  
+  u8x8.setCursor(0, 5);
+  u8x8.print("Status: Online");
+
+  u8x8.setCursor(0, 6);
+  u8x8.print("ID:     " + _deviceId); 
+
+  u8x8.setCursor(0, 7);
+  u8x8.print(duckMac(false));
 }
 
 // Initial LoRa settings
@@ -96,9 +114,9 @@ void ClusterDuck::setupPortal(const char *AP) {
     restartDuck();
   });
 
-  String    page = "<h1>Duck Mac Address</h1><h3>Data:</h3> <h4>" + _deviceId + "</h4>";
   webServer.on("/mac", [&]() {
-    webServer.send(200, "text/html", page);
+    String mac = duckMac(true);
+    webServer.send(200, "text/html", mac);
   });
 
   // Test 👍👌😅
@@ -131,13 +149,11 @@ bool ClusterDuck::runCaptivePortal() {
 
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
-  setupDisplay();
+  setupDisplay("Duck");
   setupLoRa();
   setupPortal();
 
   Serial.println("Duck Online");
-  u8x8.drawString(0, 1, "Duck Online");
-
 }
 
 void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message sent
@@ -151,7 +167,7 @@ void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message s
 }
 
 void ClusterDuck::setupMamaDuck() {
-  setupDisplay();
+  setupDisplay("Mama");
   setupPortal();
   setupLoRa();
 
@@ -159,7 +175,6 @@ void ClusterDuck::setupMamaDuck() {
   LoRa.receive();
 
   Serial.println("MamaDuck Online");
-  u8x8.drawString(0, 1, "MamaDuck Online");
 
   tymer.every(1800000, imAlive);
   tymer.every(43200000, reboot);
@@ -389,7 +404,7 @@ bool ClusterDuck::imAlive(void *) {
 }
 
 //Get Duck MAC address
-String ClusterDuck::duckID()
+String ClusterDuck::duckMac(boolean format)
 {
   char id1[15];
   char id2[15];
@@ -403,7 +418,23 @@ String ClusterDuck::duckID()
   String ID1 = id1;
   String ID2 = id2;
 
-  return ID1 + ID2;
+  String unformattedMac = ID1 + ID2;
+
+  if(format == true){
+    String formattedMac = "";
+    for(int i = 0; i < unformattedMac.length(); i++){
+      if(i % 2 == 0 && i != 0){
+        formattedMac += ":";
+        formattedMac += unformattedMac[i];
+      } 
+      else {
+        formattedMac += unformattedMac[i];
+      }
+    }
+    return formattedMac;
+  } else {
+    return unformattedMac;
+  }
 }
 
 //Create a uuid
