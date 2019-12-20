@@ -36,7 +36,7 @@ class ClusterDuck {
     static void setDeviceId(String deviceId = "", const int formLength = 10);
     static void begin(int baudRate = 115200);
     static void setupLoRa(long BAND = 915E6, int SS = 18, int RST = 14, int DI0 = 26, int TxPower = 20);
-    static void setupDisplay();
+    static void setupDisplay(String deviceType);
     static void setupPortal(const char *AP = " 🆘 DUCK EMERGENCY PORTAL");
     static bool runCaptivePortal();
 
@@ -50,7 +50,7 @@ class ClusterDuck {
 
     static void repeatLoRaPacket(int packetSize);
 
-    static String duckID();
+    static String duckMac(boolean format);
 
     static int _rssi;
     static float _snr;
