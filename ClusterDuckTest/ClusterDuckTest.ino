@@ -6,7 +6,6 @@
 ClusterDuck duck;
 
 void setup() {
-  //timer.tick();
   
   // put your setup code here, to run once:
   duck.begin();
@@ -17,6 +16,8 @@ void setup() {
 }
 
 void loop() {
+  //timer.tick();
+  
   // put your main code here, to run repeatedly:
   duck.runMamaDuck();
   
