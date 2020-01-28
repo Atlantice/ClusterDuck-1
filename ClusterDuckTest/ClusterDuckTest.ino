@@ -1,16 +1,29 @@
-#define PAPA //TODO: try to get away from using this
 #include "ClusterDuck.h"
+//#include "timer.h"
 
-ClusterDuck duck("Device ID");
+//auto timer = timer_create_default(); // create a timer with default settings
+
+ClusterDuck duck;
 
 void setup() {
+  
   // put your setup code here, to run once:
   duck.begin();
-  duck.setupPapaDuck("quickstart", "PAPA", "", "HEINEKEN", "duckduckowl");
+  duck.setDeviceId("Z", 10);
+  duck.setupMamaDuck();
 
+  //timer.every(300000, runSensor);
 }
 
 void loop() {
+  //timer.tick();
+  
   // put your main code here, to run repeatedly:
-  duck.runPapaDuck();
+  duck.runMamaDuck();
+  
+}
+
+bool runSensor(void *) {
+
+  return true;
 }

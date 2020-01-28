@@ -4,14 +4,18 @@ U8X8_SSD1306_128X64_NONAME_SW_I2C u8x8(/* clock=*/ 15, /* data=*/ 4, /* reset=*/
 
 IPAddress apIP(192, 168, 1, 1);
 WebServer webServer(80);
-#ifdef PAPA
-WiFiClientSecure wifiClient;
-PubSubClient client(server, 8883, wifiClient);
-#endif
+
+auto tymer = timer_create_default(); // create a timer with default settings
+
+String ClusterDuck::_deviceId = "";
+
+ClusterDuck::ClusterDuck() {
 
 
-ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
-  String _deviceId = deviceId;
+}
+
+void ClusterDuck::setDeviceId(String deviceId, const int formLength) {
+  _deviceId = deviceId;
 
   byte codes[16] = {0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xB1, 0xB2, 0xB3, 0xB4, 0xC1, 0xC2, 0xD1, 0xD2, 0xD3, 0xE4, 0xF4};
   for (int i = 0; i < 16; i++) {
@@ -22,7 +26,6 @@ ClusterDuck::ClusterDuck(String deviceId, const int formLength) {
 
   formArray = values;
   fLength = formLength;
-
 }
 
 void ClusterDuck::begin(int baudRate) {
@@ -31,9 +34,27 @@ void ClusterDuck::begin(int baudRate) {
   //Serial.println(_deviceId + " says Quack!");
 }
 
-void ClusterDuck::setupDisplay()  {
+void ClusterDuck::setupDisplay(String deviceType)  {
   u8x8.begin();
   u8x8.setFont(u8x8_font_chroma48medium8_r);
+
+  u8x8.setCursor(0, 1);
+  u8x8.print("    ((>.<))    ");
+
+  u8x8.setCursor(0, 2);
+  u8x8.print("  Project OWL  ");
+  
+  u8x8.setCursor(0, 4);
+  u8x8.print("Device: " + deviceType);
+  
+  u8x8.setCursor(0, 5);
+  u8x8.print("Status: Online");
+
+  u8x8.setCursor(0, 6);
+  u8x8.print("ID:     " + _deviceId); 
+
+  u8x8.setCursor(0, 7);
+  u8x8.print(duckMac(false));
 }
 
 // Initial LoRa settings
@@ -93,9 +114,9 @@ void ClusterDuck::setupPortal(const char *AP) {
     restartDuck();
   });
 
-  String    page = "<h1>Duck Mac Address</h1><h3>Data:</h3> <h4>" + _deviceId + "</h4>";
   webServer.on("/mac", [&]() {
-    webServer.send(200, "text/html", page);
+    String mac = duckMac(true);
+    webServer.send(200, "text/html", mac);
   });
 
   // Test 👍👌😅
@@ -126,139 +147,13 @@ bool ClusterDuck::runCaptivePortal() {
   }
 }
 
-
-#ifdef PAPA
-
-/**
-setupWiFi
-Connects to local SSID
-*/
-void ClusterDuck::setupWiFi(String ssid, String password) {
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-
-  // Connect to Access Poink
-  WiFi.begin(ssid, password);
-  u8x8.drawString(0, 1, "Connecting...");
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    //timer.tick(); //Advance timer to reboot after awhile
-    delay(500);
-    Serial.print(".");
-  }
-}
-
-bool ClusterDuck::checkWifiConnection() {
-  if(WiFi.status() == WL_CONNECTED)
-  {
-    return true;
-  } else {
-    Serial.print("WiFi disconnected from local network: ");
-    Serial.print(_ssid);
-    return false;
-  }
-}
-
-/**
-setupMQTT
-Sets Up MQTT
-*/
-void ClusterDuck::setupMQTT() {
-  if (!!!client.connected())
-  {
-//    if(disconnected) {
-//      timeOff = millis();
-//    }
-    Serial.print("Reconnecting client to "); Serial.println(_server);
-    while ( ! (_org == "quickstart" ? client.connect() : client.connect(_clientId, _authMethod, _token)))
-    {
-      timer.tick(); //Advance timer to reboot after awhile
-      Serial.print(".");
-      delay(500);
-    }
-//    if(disconnected) {
-//      qtest.payload = "Papa disconnected from WiFi for:" + String(millis() - timeOff); //Record that lost wifi and then reconnected
-//      papaHealth();  
-//    }
-//    else {
-//      qtest.payload = "Papa disconnected from MQTT for:" + String(millis() - timeOff); //Record that lost connection to MQTT and then reconnected
-//      //papaHealth();
-//    }
-    Serial.println();
-  }
-}
-
-void ClusterDuck::quackJson(Packet packet) {
-  const int bufferSize = 4 * JSON_OBJECT_SIZE(1);
-  DynamicJsonBuffer jsonBuffer(bufferSize);
-
-  JsonObject& root = jsonBuffer.createObject();
-
-  root["DeviceID"]        = packet.senderId;
-  root["MessageID"]       = packet.messageId;
-  root["Payload"]         = packet.payload;
-
-  root["path"]            = packet.path + "," + _deviceId;
-
-  String jsonstat;
-  root.printTo(jsonstat);
-  root.prettyPrintTo(Serial);
-
-  if (client.publish(topic, jsonstat.c_str()))
-  {
-    Serial.println("Publish ok");
-    root.prettyPrintTo(Serial);
-    Serial.println("");
-  }
-  else
-  {
-    Serial.println("Publish failed");
-  }
-}
-
-void ClusterDuck::setupPapaDuck(String org, String deviceType, String token, String ssid, String password) {
-  _org = org;
-  _deviceType = deviceType;
-  _token = token;
-  _ssid = ssid;
-  _password = password;
-
-  _server = _org + ".messaging.internetofthings.ibmcloud.com";
-  _topic = "iot-2/evt/status/fmt/json";
-  _aurthMethod = "use-token-auth";
-  _clientId = "d:" + _org + ":" + _deviceType + ":" + _deviceId;
-  
-  setupWifi(_ssid, _password);
-
-  Serial.println("");
-  Serial.println("WiFi connected - PAPA ONLINE");
-  u8x8.drawString(0, 1, "PAPA Online");
-}
-
-void ClusterDuck::runPapaDuck() {
-  if(!checkWifiConnection()) {
-    Serial.println("Reconnecting to WiFi");
-    setupWifi(_ssid, _password);
-  }
-
-  setupMQTT();
-  
-}
-
-#endif
-
-
 //Setup premade DuckLink with default settings
 void ClusterDuck::setupDuckLink() {
-  setupDisplay();
+  setupDisplay("Duck");
   setupLoRa();
   setupPortal();
 
   Serial.println("Duck Online");
-  u8x8.drawString(0, 1, "Duck Online");
-
 }
 
 void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message sent
@@ -272,19 +167,26 @@ void ClusterDuck::runDuckLink() { //TODO: Add webserver clearing after message s
 }
 
 void ClusterDuck::setupMamaDuck() {
-  setupDisplay();
+  setupDisplay("Mama");
   setupPortal();
   setupLoRa();
 
-  LoRa.onReceive(repeatLoRaPacket);
+  //LoRa.onReceive(repeatLoRaPacket);
   LoRa.receive();
 
   Serial.println("MamaDuck Online");
-  u8x8.drawString(0, 1, "MamaDuck Online");
+
+  tymer.every(1800000, imAlive);
+  tymer.every(43200000, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
+  tymer.tick();
 
+  int packetSize = LoRa.parsePacket();
+  if (packetSize != 0) {
+    repeatLoRaPacket(packetSize);
+  }
   if (runCaptivePortal()) {
     Serial.println("Portal data received");
     sendPayload(_deviceId, uuidCreator(), getPortalData());
@@ -310,8 +212,18 @@ String * ClusterDuck::getPortalData() {
   return val;
 }
 
-void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
+void ClusterDuck::sendPayloadMessage(String msg) {
+  LoRa.beginPacket();
+  couple(senderId_B, _deviceId);
+  couple(messageId_B, uuidCreator());
+  couple(payload_B, msg);
+  couple(path_B, _deviceId);
+  LoRa.endPacket(); 
+}
 
+void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, String lastPath) {
+  Serial.println("Setup Payload");
+  Serial.println(sizeof(arr));
   if (arr[0] == "0xF8") { //Send pong to a ping
     LoRa.beginPacket();
     couple(iamhere_B, "1");
@@ -324,6 +236,7 @@ void ClusterDuck::sendPayload(String senderId, String messageId, String * arr, S
       couple(messageId_B, messageId);
       for (int i = 0; i < fLength; i++) {
         couple(byteCodes[i], arr[i]);
+        Serial.println(arr[i]);
       }
       if (lastPath == "") {
         couple(path_B, _deviceId);
@@ -375,8 +288,8 @@ void ClusterDuck::repeatLoRaPacket(int packetSize) {
     Serial.println("Packet Received");
     // read packet
 
-    _rssi = LoRa.packetRssi();
-    _snr = LoRa.packetSnr();
+    //    _rssi = LoRa.packetRssi();
+    //    _snr = LoRa.packetSnr();
     //_freqErr = LoRa.packetFrequencyError();
     //    _availableBytes = LoRa.available();
 
@@ -401,6 +314,8 @@ bool ClusterDuck::checkPath(String path) {
   for (int i = 0; i < len; i++) {
     if (arr[i] == ',' || i == len - 1) {
       if (temp == _deviceId) {
+        Serial.print(path);
+        Serial.print("false");
         return false;
       }
       temp = "";
@@ -408,6 +323,8 @@ bool ClusterDuck::checkPath(String path) {
       temp += arr[i];
     }
   }
+  Serial.println("true");
+  Serial.println(path);
   return true;
 }
 
@@ -423,17 +340,17 @@ String * ClusterDuck::getPacketData(int pSize) {
     if (byteCode == senderId_B)
     {
       _lastPacket.senderId  = readMessages(mLength);
-      Serial.println("User ID: " + packetData[i]);
+      Serial.println("User ID: " + _lastPacket.senderId);
       i++;
     }
     else if (byteCode == messageId_B) {
       _lastPacket.messageId = readMessages(mLength);
-      Serial.println("Message ID: " + packetData[i]);
+      Serial.println("Message ID: " + _lastPacket.messageId);
       i++;
     }
     else if (byteCode == payload_B) {
       _lastPacket.payload = readMessages(mLength);
-      Serial.println("Message: " + packetData[i]);
+      Serial.println("Message: " + _lastPacket.payload);
       i++;
     }
     else if (byteCode == iamhere_B) { //DetectorDuck
@@ -447,7 +364,7 @@ String * ClusterDuck::getPacketData(int pSize) {
     }
     else if (byteCode == path_B) {
       _lastPacket.path = readMessages(mLength);
-      Serial.println("Path: " + packetData[i]);
+      Serial.println("Path: " + _lastPacket.path);
       i++;
     } else {
       packetData[i] = readMessages(mLength);
@@ -469,16 +386,25 @@ void ClusterDuck::restartDuck()
 }
 
 //Timer reboot
-//bool ClusterDuck::reboot(void *) {
-//  char * r[6] = {'R','e','b','o','o','t'};
-//  sendPayload(_deviceId, uuidCreator(), r);
-//  restartDuck();
-//
-//  return true;
-//}
+bool ClusterDuck::reboot(void *) {
+  String reboot = "REBOOT";
+  Serial.println(reboot);
+  sendPayloadMessage(reboot);
+  restartDuck();
+
+  return true;
+}
+
+bool ClusterDuck::imAlive(void *) {
+  String alive = "1";
+  sendPayloadMessage(alive);
+  Serial.print("alive");
+
+  return true;
+}
 
 //Get Duck MAC address
-String ClusterDuck::duckID()
+String ClusterDuck::duckMac(boolean format)
 {
   char id1[15];
   char id2[15];
@@ -492,7 +418,23 @@ String ClusterDuck::duckID()
   String ID1 = id1;
   String ID2 = id2;
 
-  return ID1 + ID2;
+  String unformattedMac = ID1 + ID2;
+
+  if(format == true){
+    String formattedMac = "";
+    for(int i = 0; i < unformattedMac.length(); i++){
+      if(i % 2 == 0 && i != 0){
+        formattedMac += ":";
+        formattedMac += unformattedMac[i];
+      } 
+      else {
+        formattedMac += unformattedMac[i];
+      }
+    }
+    return formattedMac;
+  } else {
+    return unformattedMac;
+  }
 }
 
 //Create a uuid
@@ -529,35 +471,9 @@ String ClusterDuck::getDeviceId() {
   return _deviceId;
 }
 
-#ifdef PAPA
-
-String ClusterDuck::_org;
-String ClusterDuck::_deviceType;
-String ClusterDuck::_token;
-
-String ClusterDuck::_ssid;
-String ClusterDuck::_password;
-
-String ClusterDuck::_server;
-String ClusterDuck::_topic;
-String ClusterDuck::_authMethod;
-//char ClusterDuck::token
-String ClusterDuck::_clientId;
-
-//char ClusterDuck::server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
-//char ClusterDuck::topic[]            = "iot-2/evt/status/fmt/json";
-//char ClusterDuck::authMethod[]       = "use-token-auth";
-//char ClusterDuck::token[]            = TOKEN;
-//char ClusterDuck::clientId[]         = "d:" ORG ":" DEVICE_TYPE ":" DEVICE_ID;
-
-#endif
-
-
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;
-
-String ClusterDuck::_deviceId;
 
 int ClusterDuck::_rssi = 0;
 float ClusterDuck::_snr;
