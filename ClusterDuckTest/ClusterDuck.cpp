@@ -368,7 +368,7 @@ String * ClusterDuck::getPacketData(int pSize) {
       i++;
     } else {
       packetData[i] = readMessages(mLength);
-      //Serial.println("Data" + i + ": " + packetData[i]);
+      Serial.println(packetData[i]);
       i++;
     }
   }
@@ -463,6 +463,10 @@ String ClusterDuck::uuidCreator() {
 void ClusterDuck::packetAvailable(int pSize) {
   _packetAvailable = true;
   _packetSize = pSize;
+}
+
+void ClusterDuck::loRaReceive() {
+  LoRa.receive();
 }
 
 //Getters

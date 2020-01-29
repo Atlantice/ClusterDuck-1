@@ -57,6 +57,7 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
+    static void couple(byte byteCode, String outgoing);
     static void sendPayload(String senderId, String messageId, String * arr, String path = "");
 
     static String uuidCreator();
@@ -64,6 +65,8 @@ class ClusterDuck {
     static String getDeviceId();
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
+
+    static void loRaReceive();
 
   protected:
     static Packet _lastPacket;
@@ -85,7 +88,7 @@ class ClusterDuck {
     static String runTime;
 
     static void restartDuck();
-    static void couple(byte byteCode, String outgoing);
+    
     static String readMessages(byte mLength);
     static bool reboot(void *);
     static char * readPath(byte mLength);
