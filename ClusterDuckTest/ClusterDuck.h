@@ -65,6 +65,8 @@ class ClusterDuck {
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
+    static void loRaReceive();
+
   protected:
     static Packet _lastPacket;
     static String _deviceId;

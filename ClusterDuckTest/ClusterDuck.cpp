@@ -465,6 +465,10 @@ void ClusterDuck::packetAvailable(int pSize) {
   _packetSize = pSize;
 }
 
+void ClusterDuck::loRaReceive() {
+  LoRa.receive();
+}
+
 //Getters
 
 String ClusterDuck::getDeviceId() {
