@@ -266,7 +266,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             }
 
             ////// compile the URL we will send to the backend and then submit
-            var submitUrl = "?mid=" + mid + "&fn=" + firstNameInput + "&ln=" + lastNameInput + "&location=" + locationInput + "&number=" + phoneInput + "&sok=" + currentStatusOk + "&ssos=" + currentStatusSos + "&wa=" + waterNeed + "&trans=" + transportationNeed + "&food=" + foodNeed + "&insp=" + inspectionNeed + "&aid=" + firstAidNeed + "&shelt=" + shelterNeed + "&child=" + childrenInput + "&adult=" + adultsInput + "&elderlyInput=" + elderlyInput + "&pets=" + petsInput + "&msg=" + messageInput
+            var submitUrl = "?mid=" + mid + "&fn=" + firstNameInput + "&ln=" + lastNameInput + "&location=" + locationInput + "&number=" + phoneInput + "&sok=" + currentStatusOk + "&ssos=" + currentStatusSos + "&wa=" + waterNeed + "&trans=" + transportationNeed + "&food=" + foodNeed + "&insp=" + inspectionNeed + "&aid=" + firstAidNeed + "&shelt=" + shelterNeed + "&adult=" + adultsInput + "&child=" + childrenInput + "&elderlyInput=" + elderlyInput + "&pets=" + petsInput + "&msg=" + messageInput
 
             console.log(submitUrl);
 
