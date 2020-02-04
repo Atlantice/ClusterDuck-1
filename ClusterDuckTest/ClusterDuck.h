@@ -45,10 +45,9 @@ class ClusterDuck {
     static void runDuckLink();
     static void runMamaDuck();
 
-    static String * getPortalData();
+    static String * getPortalDataArray();
+    static String getPortalDataString();
     static String * getPacketData(int pSize);
-
-    static void repeatLoRaPacket(int packetSize);
 
     static String duckMac(boolean format);
 
@@ -57,11 +56,13 @@ class ClusterDuck {
     static long _freqErr;
     static int _availableBytes;
 
-    static void sendPayload(String senderId, String messageId, String * arr, String path = "");
+    static void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "");
 
     static String uuidCreator();
 
     static String getDeviceId();
+    static Packet getLastPacket();
+    
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
@@ -76,8 +77,6 @@ class ClusterDuck {
     static int _packetSize;
     static bool _packetAvailable;
 
-    static void packetAvailable(int pSize);
-
     static DNSServer dnsServer;
     static const byte DNS_PORT;
     static const char *DNS;
@@ -90,15 +89,15 @@ class ClusterDuck {
     static void couple(byte byteCode, String outgoing);
     static String readMessages(byte mLength);
     static bool reboot(void *);
-    static char * readPath(byte mLength);
     static bool checkPath(String path);
 
     static String * formArray;
     static int fLength;
 
-    static byte byteCodes[16];
+    static byte byteCodes[15];
 
     // QuackPack
+    static byte ping_B;
     static byte senderId_B;
     static byte messageId_B;
     static byte payload_B;
