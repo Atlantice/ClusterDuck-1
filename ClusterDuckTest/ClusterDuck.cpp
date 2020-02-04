@@ -456,6 +456,10 @@ String ClusterDuck::getDeviceId() {
   return _deviceId;
 }
 
+Packet ClusterDuck::getLastPacket() {
+  return _lastPacket;
+}
+
 DNSServer ClusterDuck::dnsServer;
 const char * ClusterDuck::DNS  = "duck";
 const byte ClusterDuck::DNS_PORT = 53;

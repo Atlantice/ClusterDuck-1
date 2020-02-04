@@ -61,6 +61,8 @@ class ClusterDuck {
     static String uuidCreator();
 
     static String getDeviceId();
+    static Packet getLastPacket();
+    
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
