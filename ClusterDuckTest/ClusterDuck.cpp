@@ -285,17 +285,6 @@ String ClusterDuck::readMessages(byte mLength)  {
   return incoming;
 }
 
-char * ClusterDuck::readPath(byte mLength)  {
-  char * arr = new char[mLength];
-
-  for (int i = 0; i < mLength; i++)
-  {
-    arr[i] = (char)LoRa.read();
-  }
-  return arr;
-
-}
-
 /**
   receive
   Reads and Parses Received Packets
@@ -445,11 +434,6 @@ String ClusterDuck::uuidCreator() {
   }
 
   return String(msg);
-}
-
-void ClusterDuck::packetAvailable(int pSize) {
-  _packetAvailable = true;
-  _packetSize = pSize;
 }
 
 void ClusterDuck::loRaReceive() {

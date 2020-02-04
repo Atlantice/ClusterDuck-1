@@ -77,8 +77,6 @@ class ClusterDuck {
     static int _packetSize;
     static bool _packetAvailable;
 
-    static void packetAvailable(int pSize);
-
     static DNSServer dnsServer;
     static const byte DNS_PORT;
     static const char *DNS;
@@ -91,7 +89,6 @@ class ClusterDuck {
     static void couple(byte byteCode, String outgoing);
     static String readMessages(byte mLength);
     static bool reboot(void *);
-    static char * readPath(byte mLength);
     static bool checkPath(String path);
 
     static String * formArray;
