@@ -88,15 +88,17 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 ``void runMamaDuck()``
 - Template for running core functionality of a **MamaDuck**. Use in ``loop()``.
 
-``String * getPortalData()``
-- Returns webserver arguments based on **formLength**.
+``String * getPortalDataArray()``
+- Returns webserver arguments based on **formLength** as an array of ``Strings``.
+
+``String getPortalDataString()``
+- Returns webserver arguments based on **formLength** as a single String with arguments separated by *
 
 ``void sendPayloadMessage(String msg)``
 - Packages **msg** into a LoRa packet and sends over LoRa. Will automatically set the current device's ID as the sender ID and create a UUID for the message.
 
-``void sendPayload(String senderId, String messageId, String * arr, String lastPath)`` **TODO: Needs to be refactored into smaller parts**
-- Similar to ``sendPayloadMessage()`` however is used to handle packets that have been recieved (used by **MamaDucks**). **senderId** is the ID of the originator of the message. **messageId** is the UUID of the message. **arr** is a pointer to the stored message payload. **lastPath** is the recorded pathway of the message and is used as a check to prevent devices from sending multiple of the same message.
-- This function also handles the distinction between a data message and a **DetectorDuck** ping.
+``void sendPayloadStandard(String msg, String senderId = "", String messageId = "", String path = "")`` 
+- Similar to and might replace ``sendPayloadMessage()``. **senderId** is the ID of the originator of the message. **messageId** is the UUID of the message. **ms** is the message payload to be sent. **path** is the recorded pathway of the message and is used as a check to prevent the device from sending multiple of the same message.
 
 ``void couple(byte byteCode, String outgoing)``
 - Writes data to LoRa packet. **outgoing** is the payload data to be sent. **byteCode** is paired with the **outgoing** so it can be used to identify data on an individual level. Reference ``setDeviceId()`` for byte codes. In addition it writes the **outgoing** length to the LoRa packet. 
@@ -105,14 +107,12 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 ``String readMessages(byte mLength)``
 - Returns a String. Used after ``LoRa.read()`` to convert LoRa packet into a String.
 
-``void repeatLoRaPacket(int packetSize)``
-- Called when a packet has been recieved. Handles reading and repeating LoRa packet. Calls ``sendPayloadMessage()``.
-
 ``bool checkPath(String path)``
 - Checks if the **path** contains **deviceId**. Returns bool.
 
 ``String * getPacketData(int pSize)``
 - Called to iterate through received LoRa packet and return data as an array of Strings.
+- Note: if using standerd byte codes it will store **senderId**, **messageId**, **payload**, and **path** in a Packet object. This can be accessed using ``getLastPacket()``
 
 ``void restartDuck()``
 - If using the ESP32 architecture, calling this function will reboot the device.
@@ -131,6 +131,10 @@ Now compile and upload to your device. If using a Heltec LoRa ESP32 board you sh
 
 ``String getDeviceId()``
 - Returns the device ID
+
+``Packet getLastPacket()``
+- Returns a Packet object containing **senderId**, **messageId**, **payload**, and **path** of last packet received.
+- Note: values are updated after running ``getPacketData()``
 
 
 
