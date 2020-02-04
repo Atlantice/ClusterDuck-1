@@ -252,10 +252,16 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   } else {
     path = path + "," + _deviceId;
   }
+
+  String total = senderId + messageId + path + msg;
+  if(total.length() + 4 > 240) {
+    Serial.println("Warning: message is too large!"); //TODO: do something
+  }
   
   LoRa.beginPacket();
   couple(senderId_B, senderId);
   couple(messageId_B, messageId);
+  couple(payload_B, msg);
   couple(path_B, path);
   LoRa.endPacket();
   
