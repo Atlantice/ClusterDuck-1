@@ -5,12 +5,17 @@
 
 ClusterDuck duck;
 
+byte senderId = 0xF5;
+byte ping = 0xF4;
+
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("Z", 18);
-  duck.setupMamaDuck();
+  duck.setDeviceId("Z");
+  duck.setupLoRa();
+  LoRa.receive();
+  duck.setupDisplay("Z");
 
   //timer.every(300000, runSensor);
 }
@@ -18,8 +23,16 @@ void setup() {
 void loop() {
   //timer.tick();
   
-  // put your main code here, to run repeatedly:
-  duck.runMamaDuck();
+  int packetSize = LoRa.parsePacket();
+  if (packetSize != 0) {
+    byte whoIsIt = LoRa.peek();
+    if(whoIsIt == ping) {
+      int rssi = LoRa.packetRssi();
+      String * msg = duck.getPacketData(packetSize);
+      Packet last = duck.getLastPacket();
+      duck.sendPayloadStandard(last.senderId + ":" + rssi);
+    } 
+  }
   
 }
 
