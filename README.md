@@ -1,5 +1,14 @@
 # API and Getting Started
 Check out [Project OWL] for quickstart videos
+### Downloading Library from GitHub
+For ease of use, we will need to copy the library into your Arduino library folder.
+1. Copy ClusterDuck folder
+2. Navigate to your ``Arduino`` folder. This can be found in your default Documents folder.
+3. Navigate to the ``library`` folder
+4. Paste into ``library`` folder
+5. Restart Arduino
+6. You should now be able to see examples by going to File -> Examples -> ClusterDuck
+
 ### Quick Start
 Open new sketch in Adruino IDE and include the ClusterDuck library
 
