@@ -9,6 +9,8 @@ For ease of use, we will need to copy the library into your Arduino library fold
 5. Restart Arduino
 6. You should now be able to see examples by going to File -> Examples -> ClusterDuck
 
+You should be able pull new commits directly to this folder in your Arduino library.
+
 ### Quick Start
 Open new sketch in Adruino IDE and include the ClusterDuck library
 
