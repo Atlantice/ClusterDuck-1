@@ -68,6 +68,8 @@ class ClusterDuck {
 
     static void loRaReceive();
 
+    static void couple(byte byteCode, String outgoing);
+
   protected:
     static Packet _lastPacket;
     static String _deviceId;
@@ -86,7 +88,6 @@ class ClusterDuck {
     static String runTime;
 
     static void restartDuck();
-    static void couple(byte byteCode, String outgoing);
     static String readMessages(byte mLength);
     static bool reboot(void *);
     static bool checkPath(String path);
