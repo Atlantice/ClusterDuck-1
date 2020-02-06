@@ -27,6 +27,7 @@ void loop() {
 bool runSensor(void *) {
   LoRa.beginPacket();
   duck.couple(ping, "1");
+  duck.couple(0xF1, duck.getDeviceId());
   LoRa.endPacket();
   
   return true;
