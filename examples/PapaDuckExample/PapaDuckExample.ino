@@ -26,6 +26,7 @@ auto timer = timer_create_default(); // create a timer with default settings
 WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
 
+byte ping = 0xF4;
 
 void setup() {
   // put your setup code here, to run once:
@@ -55,9 +56,12 @@ void loop() {
 
   int packetSize = LoRa.parsePacket();
   if (packetSize != 0) {
-    Serial.println(packetSize);
-    String * val = duck.getPacketData(packetSize);
-    quackJson();
+    byte whoIsIt = LoRa.peek();
+    if(whoIsIt != ping) {
+      Serial.println(packetSize);
+      String * val = duck.getPacketData(packetSize);
+      quackJson();
+    }
   }
 
   
