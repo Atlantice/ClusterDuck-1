@@ -29,8 +29,7 @@ void loop() {
     if(whoIsIt == ping) {
       int rssi = LoRa.packetRssi();
       String * msg = duck.getPacketData(packetSize);
-      Packet last = duck.getLastPacket();
-      duck.sendPayloadStandard(last.senderId + ":" + rssi);
+      duck.sendPayloadStandard(msg[1] + ":" + rssi);
     } 
   }
   
