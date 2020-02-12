@@ -97,7 +97,7 @@ void setupMQTT()
     {
       timer.tick(); //Advance timer to reboot after awhile
       Serial.print("i");
-      //delay(500);
+      delay(500);
     }
   }
 }
