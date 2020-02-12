@@ -36,8 +36,9 @@ void loop() {
 
 bool runSensor(void *) {
 
- String sensorVal = "";
+ String sensorVal = "Temp: ";
   sensorVal += dht.readTemperature();
+  sensorVal += "Humidity: "
   sensorVal += dht.readHumidity();
 
 
