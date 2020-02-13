@@ -447,7 +447,9 @@ String ClusterDuck::getDeviceId() {
 }
 
 Packet ClusterDuck::getLastPacket() {
-  return _lastPacket;
+  Packet packet = _lastPacket;
+  _lastPacket = new Packet();
+  return packet;
 }
 
 DNSServer ClusterDuck::dnsServer;
