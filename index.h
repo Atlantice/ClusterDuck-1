@@ -131,7 +131,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             label  {
                 font-weight: bold;
             }
-            
+
         </style>
         </head>
     <body>
@@ -147,7 +147,7 @@ const char MAIN_page[] PROGMEM = R"=====(
             <p>You are connected to the UPRM Emergency Network. Please fill out the form to notify your status to first responders.</p>
 
             <div id="form">
-                <form>
+                <form action="/formSubmit" method="post">
                     <label for="firstName">First Name</label><br>
                     <input class="textbox textbox-full" name="firstName" id="firstName" type="text" placeholder="Tarzán" /><br><br>
                     <label for="lastName">Last Name(s)</label><br>
@@ -162,38 +162,39 @@ const char MAIN_page[] PROGMEM = R"=====(
                     <label for="zipcode">Zipcode</label><br>
                     <input class="textbox textbox-full" name="zipcode" type="number" placeholder="00682" /> <br /> <br />
 
-                    <label for="phone">Phone</label><br /> 
+                    <label for="phone">Phone</label><br />
                     <input class="textbox textbox-full" name="phone" id="phoneNumber" type="text" placeholder="787-123-1234" />
-                    <br /> <br /> 
+                    <br /> <br />
 
-                    <label for="status">Current Status</label><br /> 
+                    <label for="status">Current Status</label><br />
                     <input name="status" id="currentStatusSos" type="radio" value="sos" /> I'm in immediate danger (SOS)
-                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />  
+                    <br><input name="status" id="currentStatusOk" type="radio" value="ok" /> OK <br />
 
-                    <br /> 
-                    <label for="status">Needs</label><br /> 
+                    <br />
+                    <label for="status">Needs</label><br />
                     <input type="checkbox" name="water" id="waterNeed" type="radio" value="water" /> Water
-                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />  
+                    <input name="tansportation" id="transportationNeed" type="checkbox" value="transportation" /> Transportation <br />
                     <input type="checkbox" name="food" id="foodNeed" type="radio" value="food" /> Food
-                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />  
+                    <input name="inspection" id="inspectionNeed" type="checkbox" value="inspection" /> Structural Inspection <br />
                     <input type="checkbox" name="firstaid" id="firstAidNeed" type="radio" value="firstaid" /> First Aid
-                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />  
+                    <input name="shelter" type="checkbox" id="shelterNeed" value="shelter" /> Shelter <br />
 
 
                     <br />
-                    <label for="status">How many people are with you?</label><br /> 
+                    <label for="status">How many people are with you?</label><br />
                     <span>Adults </span><input class="textbox textbox-small" name="adults" id="adultsInput" type="text" placeholder="2" />
                     <span>Children </span><input class="textbox textbox-small" name="children" id="childrenInput" type="text" placeholder="2" />
                     <span>Elderly </span><input class="textbox textbox-small" name="elderly" id="elderlyInput" type="text" placeholder="2" /><br><br>
 
-                    <label for="status">Do you have any pets?</label><br /> 
+                    <label for="status">Do you have any pets?</label><br />
                     <input class="textbox textbox-full" name="pets" id="petsInput" type="text" placeholder="1 gato y 1 perro" />
 
                     <br /> <br />
-                    <label for="status">Additional Comments</label><br /> 
-                    <textarea class="textbox comments" id="commentsInput" cols="30" rows="2"></textarea><br /> 
+                    <label for="status">Additional Comments</label><br />
+                    <textarea class="textbox comments" id="commentsInput" cols="30" rows="2"></textarea><br />
 
-                    <a href="#" class="sendReportBtn" id="sendReport">SEND REPORT</a>
+                    <!--<a href="#" class="sendReportBtn" id="sendReport">SEND REPORT</a>-->
+										<input type="submit" class="sendReportBtn" value="SEND REPORT 2" />
                 </form>
 
                 <p style="font-size: 10px; text-align: center;margin-top: 24px;">Powered by Project OWL and UPRM Students</p>
@@ -210,8 +211,8 @@ const char MAIN_page[] PROGMEM = R"=====(
       </div>
 
 
-      <script type="text/javascript">         
-   
+      <script type="text/javascript">
+
          var sendReport = document.getElementById('sendReport')
          var formContent = document.getElementById("formContent")
          var bodySent = document.getElementById("bodySent")

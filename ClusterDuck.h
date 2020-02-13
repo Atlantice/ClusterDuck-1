@@ -13,7 +13,8 @@
 #include <U8x8lib.h>
 
 #include <DNSServer.h>
-#include <WebServer.h>
+//#include <WebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <ESPmDNS.h>
 #include "index.h"
 
@@ -62,7 +63,7 @@ class ClusterDuck {
 
     static String getDeviceId();
     static Packet getLastPacket();
-    
+
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
