@@ -5,13 +5,13 @@
 #include <WiFiClientSecure.h>
 #include "timer.h"
 
-#define SSID        ""
-#define PASSWORD    ""
+#define SSID     "HEINEKEN"
+#define PASSWORD "duckduckowl"
 
-#define ORG         ""                  // "quickstart" or use your organisation
-#define DEVICE_ID   ""
+#define ORG         "9c6nfo"                  // "quickstart" or use your organisation
+#define DEVICE_ID   "OWL_HOUSE"
 #define DEVICE_TYPE "PAPA"                // your device type or not used for "quickstart"
-#define TOKEN       ""      // your device token or not used for "quickstart"#define SSID        "nick_owl" // Type your SSID
+#define TOKEN       ")S(j_EsrmnW9OtEXbt"      // your device token or not used for "quickstart"#define SSID      
 
 char server[]           = ORG ".messaging.internetofthings.ibmcloud.com";
 char topic[]            = "iot-2/evt/status/fmt/json";
