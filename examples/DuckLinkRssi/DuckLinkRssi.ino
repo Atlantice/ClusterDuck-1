@@ -6,7 +6,7 @@
 ClusterDuck duck;
 
 byte senderId = 0xF5;
-byte ping = 0xF1;
+byte ping = 0xF4;
 
 void setup() {
   

@@ -27,6 +27,8 @@ WiFiClientSecure wifiClient;
 PubSubClient client(server, 8883, wifiClient);
 
 byte ping = 0xF4;
+byte iamhere = 0xF8;
+byte senderId = 0xF5;
 
 void setup() {
   // put your setup code here, to run once:
@@ -57,8 +59,9 @@ void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize != 0) {
     byte whoIsIt = LoRa.peek();
-    if(whoIsIt != ping) {
+    if(whoIsIt == senderId) {
       Serial.println(packetSize);
+      Serial.println(whoIsIt);
       String * val = duck.getPacketData(packetSize);
       quackJson();
     }
