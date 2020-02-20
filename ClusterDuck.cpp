@@ -192,6 +192,7 @@ void ClusterDuck::runMamaDuck() {
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         LoRa.receive();
       }
+      delete(msg);
     } else if(whoIsIt == ping_B) {
       LoRa.beginPacket();
       couple(iamhere_B, "1");
