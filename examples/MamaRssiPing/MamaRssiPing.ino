@@ -5,17 +5,16 @@ auto timer = timer_create_default();  //create a timer with default settings
 
 ClusterDuck duck;
 
-byte senderId = 0xF5;
 byte ping = 0xF4;
 
 void setup() {
   
    //put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("P3");
+  duck.setDeviceId("P0");
   duck.setupMamaDuck();
 
-  timer.every(10000, runSensor);
+  timer.every(1000, runSensor);
 }
 
 void loop() {

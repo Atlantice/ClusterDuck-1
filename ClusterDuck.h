@@ -62,7 +62,7 @@ class ClusterDuck {
 
     static String getDeviceId();
     static Packet getLastPacket();
-    
+
     static void sendPayloadMessage(String msg);
     static bool imAlive(void *);
 
@@ -71,6 +71,17 @@ class ClusterDuck {
     static void couple(byte byteCode, String outgoing);
     static bool checkPath(String path);
 
+    // QuackPack
+    static byte ping_B;
+    static byte senderId_B;
+    static byte messageId_B;
+    static byte payload_B;
+    static byte iamhere_B;
+    static byte path_B;
+
+    static bool reboot(void *);
+    static void restartDuck();
+    
   protected:
     static Packet _lastPacket;
     static String _deviceId;
@@ -88,22 +99,15 @@ class ClusterDuck {
 
     static String runTime;
 
-    static void restartDuck();
     static String readMessages(byte mLength);
-    static bool reboot(void *);
+
 
     static String * formArray;
     static int fLength;
 
     static byte byteCodes[15];
 
-    // QuackPack
-    static byte ping_B;
-    static byte senderId_B;
-    static byte messageId_B;
-    static byte payload_B;
-    static byte iamhere_B;
-    static byte path_B;
+
 
 
 };

@@ -43,15 +43,15 @@ void ClusterDuck::setupDisplay(String deviceType)  {
 
   u8x8.setCursor(0, 2);
   u8x8.print("  Project OWL  ");
-  
+
   u8x8.setCursor(0, 4);
   u8x8.print("Device: " + deviceType);
-  
+
   u8x8.setCursor(0, 5);
   u8x8.print("Status: Online");
 
   u8x8.setCursor(0, 6);
-  u8x8.print("ID:     " + _deviceId); 
+  u8x8.print("ID:     " + _deviceId);
 
   u8x8.setCursor(0, 7);
   u8x8.print(duckMac(false));
@@ -177,7 +177,7 @@ void ClusterDuck::setupMamaDuck() {
   Serial.println("MamaDuck Online");
 
   tymer.every(1800000, imAlive);
-  tymer.every(43200000, reboot);
+  tymer.every(120000, reboot);
 }
 
 void ClusterDuck::runMamaDuck() {
@@ -192,6 +192,7 @@ void ClusterDuck::runMamaDuck() {
         sendPayloadStandard(_lastPacket.payload, _lastPacket.senderId, _lastPacket.messageId, _lastPacket.path);
         LoRa.receive();
       }
+      delete(msg);
     } else if(whoIsIt == ping_B) {
       LoRa.beginPacket();
       couple(iamhere_B, "1");
@@ -241,7 +242,7 @@ void ClusterDuck::sendPayloadMessage(String msg) {
   couple(messageId_B, uuidCreator());
   couple(payload_B, msg);
   couple(path_B, _deviceId);
-  LoRa.endPacket(); 
+  LoRa.endPacket();
 }
 
 void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messageId, String path) {
@@ -257,14 +258,14 @@ void ClusterDuck::sendPayloadStandard(String msg, String senderId, String messag
   if(total.length() + 4 > 240) {
     Serial.println("Warning: message is too large!"); //TODO: do something
   }
-  
+
   LoRa.beginPacket();
   couple(senderId_B, senderId);
   couple(messageId_B, messageId);
   couple(payload_B, msg);
   couple(path_B, path);
   LoRa.endPacket();
-  
+
   Serial.println("Packet sent");
 }
 
@@ -402,7 +403,7 @@ String ClusterDuck::duckMac(boolean format)
       if(i % 2 == 0 && i != 0){
         formattedMac += ":";
         formattedMac += unformattedMac[i];
-      } 
+      }
       else {
         formattedMac += unformattedMac[i];
       }

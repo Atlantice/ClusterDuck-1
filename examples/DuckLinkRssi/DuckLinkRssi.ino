@@ -1,27 +1,25 @@
 #include <ClusterDuck.h>
 //#include "timer.h"
 
-//auto timer = timer_create_default(); // create a timer with default settings
+auto timer = timer_create_default(); // create a timer with default settings
 
 ClusterDuck duck;
 
-byte senderId = 0xF5;
 byte ping = 0xF4;
 
 void setup() {
   
   // put your setup code here, to run once:
   duck.begin();
-  duck.setDeviceId("C1");
+  duck.setDeviceId("C0");
   duck.setupLoRa();
   LoRa.receive();
-  duck.setupDisplay("C1");
+  duck.setupDisplay("C0");
 
-  //timer.every(300000, runSensor);
+  timer.every(120000, runSensor);
 }
 
 void loop() {
-  //timer.tick();
   
   int packetSize = LoRa.parsePacket();
   if (packetSize != 0) {
@@ -30,12 +28,15 @@ void loop() {
       int rssi = LoRa.packetRssi();
       String * msg = duck.getPacketData(packetSize);
       duck.sendPayloadStandard(msg[0] + ":" + rssi);
+      LoRa.receive();
+      Serial.println(msg[0] + ":" + rssi);
     } 
   }
   
 }
 
 bool runSensor(void *) {
-
+  Serial.println("Restarting Duck...");
+  ESP.restart();
   return true;
 }
