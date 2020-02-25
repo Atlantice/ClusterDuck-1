@@ -36,7 +36,5 @@ void loop() {
 }
 
 bool runSensor(void *) {
-  Serial.println("Restarting Duck...");
-  ESP.restart();
   return true;
 }
