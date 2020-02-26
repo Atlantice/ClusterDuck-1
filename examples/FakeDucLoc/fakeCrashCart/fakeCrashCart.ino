@@ -33,7 +33,6 @@ void setup() {
 }
 
 void loop() {
-  
   int packetSize = LoRa.parsePacket();
   if (packetSize > 0) {
     Serial.println("Ping Received");
