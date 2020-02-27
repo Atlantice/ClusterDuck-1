@@ -9,7 +9,7 @@
 #define DI0     26   // GPIO26 -- SX1278's IRQ(Interrupt Request)
 #define BAND    915E6
 
-String myName = "C1";
+String myName = "M1";
 
 void setup() {
   setupTBeam();

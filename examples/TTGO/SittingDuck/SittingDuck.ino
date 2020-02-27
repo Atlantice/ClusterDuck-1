@@ -15,7 +15,7 @@ unsigned long DELAY_TIME = 30000; // 30 sec
 unsigned long delayStart = 0; // the time the delay started
 bool delayRunning = false; // true if still waiting for delay to finish
 
-String myName = "P2";
+String myName = "S3";
 
 #define SS      18
 #define RST     14
