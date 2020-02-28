@@ -449,7 +449,7 @@ String ClusterDuck::getDeviceId() {
 
 Packet ClusterDuck::getLastPacket() {
   Packet packet = _lastPacket;
-  _lastPacket = new Packet();
+  _lastPacket = Packet();
   return packet;
 }
 
